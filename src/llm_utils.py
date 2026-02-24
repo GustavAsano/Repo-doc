@@ -5,7 +5,7 @@ from typing import Optional
 
 from langchain.chat_models import init_chat_model
 
-DEFAULT_GEMINI_API_KEY = "AIzaSyD51liDLCePQcVM7PhF00LFwq92C-ZiFcg"
+DEFAULT_GEMINI_API_KEY = ""
 DEFAULT_BEDROCK_TIMEOUT_SECONDS = 180.0
 DEFAULT_BEDROCK_REGION = "us-east-1"
 BEDROCK_HAIKU_45_MODEL_ID = "anthropic.claude-haiku-4-5-20251001-v1:0"
