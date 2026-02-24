@@ -1,0 +1,44 @@
+site_name: cosmos Documentation
+site_description: Technical documentation for the cosmos repository
+site_author: Unknown
+repo_name: cosmos
+docs_dir: docs
+site_dir: site
+use_directory_urls: false
+theme:
+  name: material
+  language: en
+  features:
+  - navigation.tabs
+  - navigation.sections
+  - navigation.top
+  - search.highlight
+  - content.code.copy
+nav:
+- "Vis\xE3o Geral": index.md
+- Primeiros Passos: getting_started.md
+- "Instala\xE7\xE3o": installation.md
+- Uso: usage.md
+- Arquitetura: architecture.md
+- Tecnologias: technologies.md
+- "Refer\xEAncia de API": api_reference.md
+- "Configura\xE7\xE3o": configuration.md
+- Testes: testing.md
+- "An\xE1lise Arquivo a Arquivo": file_analysis.md
+- Chat: chat.md
+plugins:
+- search
+extra_css:
+- extra.css
+markdown_extensions:
+- admonition
+- pymdownx.superfences
+- pymdownx.details
+- pymdownx.tasklist:
+    custom_checkbox: true
+- pymdownx.highlight
+- pymdownx.inlinehilite
+- pymdownx.magiclink
+- pymdownx.extra
+- toc:
+    permalink: true
