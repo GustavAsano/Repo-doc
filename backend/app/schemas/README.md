@@ -1,0 +1,1 @@
+Place here schemas of your application. They are used to model requests parameters and responses with pydantic models. FastAPI uses them to validate requests and responses and to generate OpenAPI documentation.

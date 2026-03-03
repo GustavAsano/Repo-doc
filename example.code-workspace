@@ -1,0 +1,57 @@
+{
+	"folders": [
+		{
+			"name": "Project Root",
+			"path": "."
+		},
+		{
+			"name": "backend",
+			"path": "backend"
+		},
+		{
+			"name": "frontend",
+			"path": "frontend"
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			// Already included as workspace folders
+			"backend/": true,
+			"frontend/": true,
+		},
+		// We dont actually care about the inlay hints font size, this value
+		// is set to detect wether we are in multi-root mode or not, which we
+		// use to display the tutorial of opening the workspace in multi-root mode
+		"editor.inlayHints.fontSize": 1,
+		// ENOSPC error fix
+		"files.watcherExclude": {
+			"**/.git/objects/**": true,
+			"**/.git/subtree-cache/**": true,
+			"**/node_modules/*": true,
+			"**/.hg/store/**": true,
+			"**/venvs/**": true,
+			"**/data/**": true,
+			"**/.pytest_cache/**": true,
+			"**/build/**": true,
+			".ruff_cache/**": true
+		},
+		"python.analysis.exclude": [
+			"*"
+		]
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-python.python",
+			"mhutchie.git-graph",
+			"mutantdino.resourcemonitor",
+			"charliermarsh.ruff",
+			"ms-azuretools.vscode-docker",
+			"dbaeumer.vscode-eslint",
+			"Vue.volar",
+		],
+		"unwantedRecommendations": [
+			"ms-python.flake8",
+			"ms-python.black-formatter"
+		]
+	}
+}
