@@ -13,7 +13,7 @@ ENV VITE_APP_BACKEND_API_BASE=$VITE_APP_BACKEND_API_BASE
 
 WORKDIR /app
 COPY . .
-RUN bun install --frozen-lockfile
+RUN bun install 
 RUN bun run build
 
 # ---- Serve stage ----
