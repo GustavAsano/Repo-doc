@@ -3,9 +3,10 @@ import Components from "unplugin-vue-components/vite";
 import Fonts from "unplugin-fonts/vite";
 import Vue from "@vitejs/plugin-vue";
 import Vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
+import { defineConfig } from "vite";
 import { fileURLToPath, URL } from "node:url";
 
-const defineConfig = {
+export default defineConfig({
   plugins: [
     AutoImport({
       imports: ["vue"],
@@ -43,10 +44,6 @@ const defineConfig = {
       "/chat":   { target: "http://repo-doc-backend:8000", changeOrigin: true },
       "/graph":  { target: "http://repo-doc-backend:8000", changeOrigin: true },
       "/health": { target: "http://repo-doc-backend:8000", changeOrigin: true },
-      // MkDocs preview proxy (browser-accessible path to internal MkDocs server)
-      "/docs/preview": { target: "http://repo-doc-backend:8000", changeOrigin: true },
     },
   },
-};
-
-export default defineConfig;
+});

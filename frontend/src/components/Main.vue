@@ -207,9 +207,9 @@ getLibrary('functional').then((entries) => { store.functionalLibrary = entries; 
 .side-title {
   display: flex; align-items: center; padding: 10px 16px; cursor: pointer;
   font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase;
-  letter-spacing: 0.08em; color: #6b7280; transition: color 0.15s; user-select: none;
+  letter-spacing: 0.08em; color: #9ca3af; transition: color 0.15s; user-select: none;
 }
-.side-title:hover { color: #9ca3af; }
+.side-title:hover { color: #e5e7eb; }
 .side-title .rotated { transform: rotate(-90deg); }
 .panel-body { padding: 0 16px 14px; }
 

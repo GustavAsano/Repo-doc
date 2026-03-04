@@ -131,6 +131,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import axios from 'axios';
 import { useToast } from 'vue-toastification';
 import { useAppStore } from '@/stores/store';
 import { LANGUAGES } from '@/types/types';

@@ -7,12 +7,13 @@ export default createVuetify({
     defaultTheme: 'dark',
     themes: {
       dark: {
-        dark: true,  // ← critical: tells Vuetify this is actually a dark theme
+        dark: true,
         colors: {
           primary: '#14b8a6',
-          surface: '#0d1117',      // ← fixes dropdown/menu background
+          secondary: '#1E1E1E',
+          surface: '#0d1117',
           background: '#080c12',
-          'on-surface': '#e5e7eb', // ← fixes text on dropdowns
+          'on-surface': '#e5e7eb',
           'on-background': '#e5e7eb',
         },
       },

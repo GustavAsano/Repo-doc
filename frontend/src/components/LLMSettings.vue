@@ -136,7 +136,7 @@ async function save() {
 
 <style scoped>
 .settings-panel { display: flex; flex-direction: column; gap: 12px; }
-.section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #6b7280; font-family: 'JetBrains Mono', monospace; }
+.section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af; font-family: 'JetBrains Mono', monospace; }
 .provider-pills { display: flex; gap: 6px; }
 .pill {
   padding: 5px 14px; border-radius: 4px; border: 1px solid #374151;
