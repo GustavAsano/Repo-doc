@@ -134,6 +134,7 @@ import { ref, computed } from 'vue';
 import { useToast } from 'vue-toastification';
 import { useAppStore } from '@/stores/store';
 import { LANGUAGES } from '@/types/types';
+import axios from 'axios';
 import {
   loadRepoFromUrl,
   loadRepoFromFolder,
@@ -208,7 +209,12 @@ async function load() {
     toast.success(`Repository "${state!.repo_name}" loaded`);
     emit('loaded');
   } catch (e: unknown) {
+  if (axios.isAxiosError(e)) {
+      const detail = e.response?.data?.detail ?? e.response?.data ?? e.message;
+      toast.error('Load failed: ' + JSON.stringify(detail));
+  } else {
     toast.error('Load failed: ' + String(e));
+  }
   } finally {
     store.loading = false;
     store.loadingMessage = '';

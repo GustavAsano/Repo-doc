@@ -8,9 +8,9 @@ import tempfile
 import requests
 from io import BytesIO
 
-
-IN_DIR = Path("in").resolve()
-IN_DIR.mkdir(exist_ok=True)
+import os
+IN_DIR = Path(os.getenv("APP_DATA_DIR", "/app/data")) / "in"
+IN_DIR.mkdir(parents=True, exist_ok=True)
 
 def detect_source_type(source: str) -> str:
     source_path = Path(source)
@@ -87,11 +87,10 @@ def load_from_git(git_url: str) -> str:
     )
     return temp_dir
 
-def load_from_git(git_url: str) -> str:
+def load_from_git(git_url: str) -> tuple[str, str, str]:
     """
     Download a public GitHub repository as a ZIP and extract it into in/<repo_name>
     """
-    # Parse repo info
     parts = git_url.rstrip("/").split("/")
     owner, repo = parts[-2], parts[-1].replace(".git", "")
 
@@ -101,31 +100,43 @@ def load_from_git(git_url: str) -> str:
     if target_dir.exists():
         shutil.rmtree(target_dir)
 
-    # Try main, then master
-    zip_urls = [
-        f"https://github.com/{owner}/{repo}/archive/refs/heads/main.zip",
-        f"https://github.com/{owner}/{repo}/archive/refs/heads/master.zip",
-    ]
-
+    # Try main, master, then dev
+    branches = ["main", "master", "dev", "develop"]
     response = None
-    for url in zip_urls:
-        response = requests.get(url)
-        if response.status_code == 200:
-            break
+    used_branch = None
 
-    if response is None or response.status_code != 200:
-        raise RuntimeError("Failed to download repository ZIP (main/master not found)")
+    for branch in branches:
+        url = f"https://github.com/{owner}/{repo}/archive/refs/heads/{branch}.zip"
+        try:
+            r = requests.get(url, timeout=30)
+            if r.status_code == 200:
+                response = r
+                used_branch = branch
+                break
+        except requests.exceptions.ConnectionError:
+            raise RuntimeError(
+                f"Cannot reach github.com — check that the backend container has outbound internet access."
+            )
+        except requests.exceptions.Timeout:
+            raise RuntimeError("Request to GitHub timed out.")
 
-    # Extract ZIP
+    if response is None:
+        raise RuntimeError(
+            f"Could not find repository '{owner}/{repo}' on GitHub. "
+            f"Tried branches: {', '.join(branches)}. "
+            f"Make sure the URL is correct and the repo is public."
+        )
+
     with zipfile.ZipFile(BytesIO(response.content)) as zip_ref:
         zip_ref.extractall(IN_DIR)
 
-    # GitHub ZIP creates repo-main/ or repo-master/
-    extracted_dir = next(IN_DIR.glob(f"{repo}-*"))
+    extracted_dir = next(IN_DIR.glob(f"{repo}-*"), None)
+    if extracted_dir is None:
+        raise RuntimeError(f"Failed to extract repository ZIP for '{repo}'.")
 
     extracted_dir.rename(target_dir)
 
-    return str(target_dir),repo, owner
+    return str(target_dir), repo, owner
 
 def load_repository(source: str) -> str:
     source_type = detect_source_type(source)

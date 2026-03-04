@@ -147,7 +147,7 @@ async function save() {
 .pill.active { border-color: #14b8a6; color: #14b8a6; background: rgba(20,184,166,0.08); }
 .field-row { display: flex; gap: 10px; }
 .field-group { display: flex; flex-direction: column; gap: 6px; }
-.field-label { font-size: 11px; color: #6b7280; font-family: 'JetBrains Mono', monospace; }
+.field-label { font-size: 11px; color: #9ca3af; font-family: 'JetBrains Mono', monospace; }
 .key-row { display: flex; align-items: center; gap: 12px; }
 .save-btn { font-family: 'JetBrains Mono', monospace !important; font-size: 12px !important; letter-spacing: 0.05em !important; }
 </style>

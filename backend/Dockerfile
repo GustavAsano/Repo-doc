@@ -20,27 +20,28 @@ RUN apt-get update && apt-get install -y \
 
 RUN adduser --disabled-password --uid ${UID} ${USER}
 
+# Create app and data dirs with correct ownership before switching user
+USER root
+RUN mkdir -p \
+      /app/data/in \
+      /app/data/out \
+      /app/data/workspace \
+      /app/data/library/repos \
+      /app/data/library_functional/repos \
+      /app/data/.chat_history && \
+    chown -R ${UID}:${UID} /app /app/data
 USER ${UID}
+
 WORKDIR /app
 
 RUN pip3 install "uv>=0.4.12" --user
 ENV PATH="/home/${USER}/.local/bin:${PATH}"
 ENV UV_PROJECT_ENVIRONMENT="/home/${USER}/.venv"
 
-# Copy only dependency manifest — lock file regenerated during build
-COPY --chown=${UID}:${UID} pyproject.toml ./
+COPY --chown=${UID}:${UID} pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev --no-install-project --no-editable
 
-# Regenerate lock file from pyproject.toml then install deps (no project yet)
-RUN uv lock && uv sync --no-dev --no-install-project --no-editable
-
-# Copy source code
 COPY --chown=${UID}:${UID} . .
-
-USER root
-RUN mkdir -p /app/data && chown -R ${UID}:${UID} /app/data
-USER ${UID}
-
-# Install the project itself
 RUN uv sync --no-dev
 
 EXPOSE 8000
