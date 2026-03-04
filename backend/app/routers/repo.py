@@ -143,6 +143,19 @@ async def load_repo(
         language=normalized_lang,
     )
 
+    # Copy code.json to library dir immediately so /docs/generate can find it
+    try:
+        from app.core.state import _library_repo_dir_for_language
+        import shutil as _shutil
+        lib_repo_dir = _library_repo_dir_for_language(repo_name, normalized_lang)
+        lib_repo_dir.mkdir(parents=True, exist_ok=True)
+        if code_json_path.exists():
+            _shutil.copy2(code_json_path, lib_repo_dir / "code.json")
+        if graph_path and Path(graph_path).exists():
+            _shutil.copy2(graph_path, lib_repo_dir / "graph.json")
+    except Exception as copy_exc:
+        print(f"[repo] Warning: could not copy assets to library: {copy_exc}")
+
     return RepoStateResponse(
         repo_name=repo_name,
         repo_path=repo_path,

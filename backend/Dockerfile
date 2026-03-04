@@ -20,7 +20,6 @@ RUN apt-get update && apt-get install -y \
 
 RUN adduser --disabled-password --uid ${UID} ${USER}
 
-# Create app and data dirs with correct ownership before switching user
 USER root
 RUN mkdir -p \
       /app/data/in \
@@ -38,8 +37,8 @@ RUN pip3 install "uv>=0.4.12" --user
 ENV PATH="/home/${USER}/.local/bin:${PATH}"
 ENV UV_PROJECT_ENVIRONMENT="/home/${USER}/.venv"
 
-COPY --chown=${UID}:${UID} pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev --no-install-project --no-editable
+COPY --chown=${UID}:${UID} pyproject.toml ./
+RUN uv lock && uv sync --no-dev --no-install-project --no-editable
 
 COPY --chown=${UID}:${UID} . .
 RUN uv sync --no-dev
