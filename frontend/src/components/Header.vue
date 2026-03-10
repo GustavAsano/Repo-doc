@@ -9,7 +9,7 @@
       <v-divider class="mx-2" inset vertical></v-divider>
     </template>
     <v-app-bar-title class="text-primary font-weight-black">
-      <span class="text-h4">Repository Documentation <v-icon size="x-small" icon="mdi-clipboard-text" /></span>
+      <span class="text-h4">Example <v-icon size="x-small" icon="mdi-clipboard-text" /></span>
     </v-app-bar-title>
     <v-spacer></v-spacer>
 
@@ -19,9 +19,9 @@
       </template>
 
       <template #default>
-        <v-card title="GenMS - Repository Documentation">
+        <v-card title="GenMS - Example">
           <v-card-text>
-            Repository Documentation is an AI project developed by the GenMS team in
+            Example is an AI project developed by the GenMS team in
             <a href="https://www.managementsolutions.com" target="_blank">Management Solutions</a>.
           </v-card-text>
           <v-card-actions>
