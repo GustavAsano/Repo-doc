@@ -9,7 +9,7 @@
       <v-divider class="mx-2" inset vertical></v-divider>
     </template>
     <v-app-bar-title class="text-primary font-weight-black">
-      <span class="text-h4">Example <v-icon size="x-small" icon="mdi-clipboard-text" /></span>
+      <span class="text-h4">Repository Documentation <v-icon size="x-small" icon="mdi-clipboard-text" /></span>
     </v-app-bar-title>
     <v-spacer></v-spacer>
 
