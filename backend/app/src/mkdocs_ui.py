@@ -256,7 +256,9 @@ def generate_mkdocs_config(
     docs_dir.mkdir(exist_ok=True)
 
     create_index_md(docs_dir, repo_name)
-    create_chat_md(docs_dir, repo_name)
+    chat_md = docs_dir / "chat.md"
+    if chat_md.exists():
+        chat_md.unlink()
     ensure_extra_css(docs_dir)
     nav = build_nav(docs_dir)
 
