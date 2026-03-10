@@ -318,6 +318,52 @@ def generate_mkdocs_config(
 
 
 
+def _first_nav_doc_path(nav_node) -> str | None:
+    if isinstance(nav_node, str):
+        return nav_node.strip() or None
+    if isinstance(nav_node, list):
+        for item in nav_node:
+            found = _first_nav_doc_path(item)
+            if found:
+                return found
+        return None
+    if isinstance(nav_node, dict):
+        for value in nav_node.values():
+            found = _first_nav_doc_path(value)
+            if found:
+                return found
+        return None
+    return None
+
+
+def _resolve_docs_entry_html(docs_dir: Path) -> str:
+    mkdocs_config_path = docs_dir.parent / "mkdocs.yml"
+    try:
+        if mkdocs_config_path.exists():
+            with open(mkdocs_config_path, encoding="utf-8") as f:
+                mkdocs_config = yaml.safe_load(f) or {}
+            nav_first_doc = _first_nav_doc_path(mkdocs_config.get("nav"))
+            if nav_first_doc:
+                nav_doc_path = Path(str(nav_first_doc).strip())
+                if nav_doc_path.suffix.lower() == ".md" and nav_doc_path.name.lower() != "chat.md":
+                    if (docs_dir / nav_doc_path.name).exists():
+                        return f"{nav_doc_path.stem}.html"
+    except Exception:
+        pass
+    if (docs_dir / "index.md").exists():
+        return "index.html"
+    try:
+        md_candidates = sorted(
+            [p for p in docs_dir.glob("*.md") if p.name.lower() != "chat.md"],
+            key=lambda p: p.name.lower(),
+        )
+        if md_candidates:
+            return f"{md_candidates[0].stem}.html"
+    except Exception:
+        pass
+    return "index.html"
+
+
 def _is_port_free(port: int) -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex(("127.0.0.1", port)) != 0

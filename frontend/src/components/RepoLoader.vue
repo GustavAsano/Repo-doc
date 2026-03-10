@@ -202,7 +202,7 @@ async function load() {
       state = await activateLibraryEntry(store.selectedLibraryKey, 'technical', true);
       if (state.mkdocs_port) {
         store.mkdocsPort = state.mkdocs_port;
-        store.docsUrl = `http://127.0.0.1:${state.mkdocs_port}/`;
+        store.docsUrl = '/docs/preview/';
       }
     }
     store.repoState = state!;

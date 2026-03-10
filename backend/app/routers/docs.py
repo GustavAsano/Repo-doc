@@ -133,14 +133,14 @@ async def _run_in_thread(fn, *args, **kwargs):
 def _make_progress_queue_callback(queue: asyncio.Queue):
     """Returns a synchronous callback that the doc_gen functions can call,
     which safely puts events onto the asyncio queue from a thread."""
+    # Capture the running loop at factory time (we're in an async context here).
+    # Calling asyncio.get_event_loop() from inside the worker thread fails in
+    # Python 3.10+ when the thread has no loop of its own.
+    loop = asyncio.get_event_loop()
 
     def callback(event: dict):
         try:
-            import concurrent.futures
-
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                asyncio.run_coroutine_threadsafe(queue.put(event), loop)
+            asyncio.run_coroutine_threadsafe(queue.put(event), loop)
         except Exception as exc:
             print(f"[docs] progress callback error: {exc}")
 

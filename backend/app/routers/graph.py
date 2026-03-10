@@ -10,23 +10,39 @@ from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 
-from app.core.state import load_repo_library, parse_library_entry_key, resolve_library_entry_assets, _normalize_language, WORKSPACE_DIR
+from app.core.state import (
+    load_repo_library,
+    parse_library_entry_key,
+    resolve_library_entry_assets,
+    _normalize_language,
+    WORKSPACE_DIR,
+    OUT_DIR,
+)
 
 router = APIRouter(prefix="/graph", tags=["Graph"])
+
+
+def _try_load_graph(path: Path) -> dict | None:
+    try:
+        if path.exists():
+            return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        pass
+    return None
 
 
 @router.get("/{repo_name}", summary="Get the dependency graph for a repository")
 async def get_graph(repo_name: str, language: str = "EN-US"):
     """
     Returns the nodes/edges graph JSON for a repository.
-    Looks in: active workspace -> library storage.
+    Looks in: library storage (language-matched first) -> out/ workspace.
     """
     lang = _normalize_language(language)
     library = load_repo_library()
 
     graph_data = None
 
-    # 1. Try library
+    # 1. Try library — prefer language match, fall back to any variant
     for entry_key, entry in library.items():
         if not isinstance(entry, dict):
             continue
@@ -37,19 +53,24 @@ async def get_graph(repo_name: str, language: str = "EN-US"):
         entry_lang = _normalize_language(entry.get("language"))
         resolved = resolve_library_entry_assets(entry_repo, entry)
         graph_path_str = resolved.get("library_graph_json") or ""
-        if graph_path_str and Path(graph_path_str).exists():
-            # Prefer matching language
+        data = _try_load_graph(Path(graph_path_str)) if graph_path_str else None
+        if data is not None:
             if entry_lang == lang:
-                try:
-                    graph_data = json.loads(Path(graph_path_str).read_text(encoding="utf-8"))
-                    break
-                except Exception:
-                    pass
+                graph_data = data
+                break
             elif graph_data is None:
-                try:
-                    graph_data = json.loads(Path(graph_path_str).read_text(encoding="utf-8"))
-                except Exception:
-                    pass
+                graph_data = data
+
+    # 2. Fall back to the raw out/ workspace path produced by repo_mapping
+    if graph_data is None:
+        for candidate in [
+            OUT_DIR / repo_name / "graphs" / "graph.json",
+            OUT_DIR / repo_name / "graph.json",
+        ]:
+            data = _try_load_graph(candidate)
+            if data is not None:
+                graph_data = data
+                break
 
     if graph_data is None:
         raise HTTPException(status_code=404, detail=f"No graph found for repository '{repo_name}'.")

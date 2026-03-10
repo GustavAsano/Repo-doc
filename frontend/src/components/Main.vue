@@ -34,34 +34,6 @@
             </transition>
           </div>
 
-          <!-- Generation -->
-          <div class="side-section" v-if="store.repoState">
-            <div class="side-title" @click="togglePanel('gen')">
-              <v-icon size="13" class="mr-2" color="teal">mdi-file-document-edit-outline</v-icon>
-              Generation
-              <v-icon size="14" class="ml-auto" :class="{ rotated: !panels.gen }">mdi-chevron-down</v-icon>
-            </div>
-            <transition name="collapse">
-              <div v-show="panels.gen" class="panel-body">
-                <ProgressPanel />
-              </div>
-            </transition>
-          </div>
-
-          <!-- Sections -->
-          <div class="side-section" v-if="store.repoState">
-            <div class="side-title" @click="togglePanel('sec')">
-              <v-icon size="13" class="mr-2" color="#6366f1">mdi-table-edit</v-icon>
-              Sections
-              <v-icon size="14" class="ml-auto" :class="{ rotated: !panels.sec }">mdi-chevron-down</v-icon>
-            </div>
-            <transition name="collapse">
-              <div v-show="panels.sec" class="panel-body">
-                <SectionsEditor :show-func-tab="showFuncSections" />
-              </div>
-            </transition>
-          </div>
-
           <!-- Export -->
           <div class="side-section" v-if="store.hasActiveDocs">
             <div class="side-title" @click="togglePanel('export')">
@@ -98,6 +70,7 @@
 
         <!-- Tab content -->
         <div class="tab-body">
+
           <!-- Welcome / setup -->
           <div v-if="activeTab === 'welcome'" class="welcome-view">
             <div class="welcome-inner">
@@ -124,6 +97,43 @@
             </div>
           </div>
 
+          <!-- Generate tab: sections only -->
+          <div v-if="activeTab === 'generate'" class="generate-view">
+            <div class="generate-header">
+              <div class="generate-header-left">
+                <h2 class="generate-title">Sections</h2>
+                <p class="generate-sub">Customise which sections to include and their descriptions.</p>
+              </div>
+            </div>
+            <div class="generate-body">
+              <div class="gen-col sections-col">
+                <SectionsEditor :show-func-tab="showFuncSections" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Run tab -->
+          <div v-if="activeTab === 'run'" class="generate-view">
+            <div class="generate-header">
+              <div class="generate-header-left">
+                <h2 class="generate-title">Run Generation</h2>
+                <p class="generate-sub">Start documentation generation and monitor progress.</p>
+              </div>
+              <div class="run-status-badge" :class="runStatusClass">
+                <span class="run-status-dot" :class="{ pulse: store.generating }"></span>
+                <span class="run-status-label">{{ runStatusLabel }}</span>
+                <span v-if="store.generating && store.progressPhase" class="run-status-phase">{{ store.progressPhase }}</span>
+                <span v-if="store.generating && store.progressTotal > 0" class="run-status-calls">{{ store.progressCurrent }}/{{ store.progressTotal }}</span>
+                <span v-if="store.progressCost !== null" class="run-status-cost">${{ store.progressCost.toFixed(4) }}</span>
+              </div>
+            </div>
+            <div class="generate-body">
+              <div class="gen-col run-col">
+                <ProgressPanel />
+              </div>
+            </div>
+          </div>
+
           <!-- Docs -->
           <DocsViewer v-if="activeTab === 'docs'" />
 
@@ -132,6 +142,7 @@
 
           <!-- Chat -->
           <ChatPanel v-if="activeTab === 'chat'" />
+
         </div>
       </section>
     </div>
@@ -154,7 +165,7 @@ import ChatPanel from '@/components/ChatPanel.vue';
 const store = useAppStore();
 const activeTab = ref('welcome');
 
-const panels = ref({ llm: true, repo: true, gen: true, sec: false, export: true });
+const panels = ref({ llm: true, repo: true, export: true });
 function togglePanel(key: keyof typeof panels.value) {
   panels.value[key] = !panels.value[key];
 }
@@ -163,11 +174,25 @@ const showFuncSections = computed(() =>
   ['technical_and_functional', 'functional_only'].includes(store.generationMode),
 );
 
+const runStatusLabel = computed(() => {
+  if (store.generating) return 'Generating';
+  if (store.repoState?.docs_generated) return 'Done';
+  return 'Ready';
+});
+
+const runStatusClass = computed(() => {
+  if (store.generating) return 'status-running';
+  if (store.repoState?.docs_generated) return 'status-done';
+  return 'status-idle';
+});
+
 const allTabs = [
-  { id: 'welcome', label: 'Home',       icon: 'mdi-home-outline',                  always: true },
-  { id: 'docs',    label: 'Docs',       icon: 'mdi-book-open-page-variant-outline', always: false },
-  { id: 'graph',   label: 'Graph',      icon: 'mdi-graph-outline',                  always: false },
-  { id: 'chat',    label: 'Chat',       icon: 'mdi-message-text-outline',           always: false },
+  { id: 'welcome',  label: 'Home',     icon: 'mdi-home-outline',                   always: true  },
+  { id: 'graph',    label: 'Graph',    icon: 'mdi-graph-outline',                  always: false },
+  { id: 'generate', label: 'Sections', icon: 'mdi-table-edit',                     always: false },
+  { id: 'run',      label: 'Run',      icon: 'mdi-file-document-edit-outline',     always: false },
+  { id: 'docs',     label: 'Docs',     icon: 'mdi-book-open-page-variant-outline', always: false },
+  { id: 'chat',     label: 'Chat',     icon: 'mdi-message-text-outline',            always: false },
 ];
 
 const visibleTabs = computed(() =>
@@ -175,15 +200,12 @@ const visibleTabs = computed(() =>
 );
 
 function onRepoLoaded() {
-  panels.value.gen = true;
-  panels.value.sec = true;
-  if (store.hasActiveDocs) {
-    activeTab.value = 'docs';
-  }
+  // Show graph immediately after loading so user sees repo structure
+  activeTab.value = 'graph';
 }
 
 watch(() => store.hasActiveDocs, (v) => {
-  if (v && activeTab.value === 'welcome') activeTab.value = 'docs';
+  if (v) activeTab.value = 'run';
 });
 
 // Load library on mount
@@ -250,4 +272,44 @@ getLibrary('functional').then((entries) => { store.functionalLibrary = entries; 
 .step-num { width: 20px; height: 20px; border-radius: 50%; background: #1f2937; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #4b5563; flex-shrink: 0; }
 .w-step.done .step-num { background: rgba(20,184,166,0.15); color: #14b8a6; }
 .step-text { flex: 1; }
+
+/* Generate view */
+.generate-view { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 24px; gap: 20px; }
+.generate-header { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.generate-header-left { display: flex; flex-direction: column; gap: 4px; }
+
+/* Run status badge */
+.run-status-badge {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px; border-radius: 6px; border: 1px solid #1f2937;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  background: #0d1117; flex-shrink: 0;
+}
+.run-status-badge.status-idle { border-color: #1f2937; }
+.run-status-badge.status-running { border-color: rgba(20,184,166,0.4); background: rgba(20,184,166,0.06); }
+.run-status-badge.status-done { border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.06); }
+.run-status-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: #374151; flex-shrink: 0;
+}
+.run-status-badge.status-running .run-status-dot { background: #14b8a6; animation: pulse 1.2s infinite; }
+.run-status-badge.status-done .run-status-dot { background: #10b981; }
+.run-status-label { color: #9ca3af; }
+.run-status-badge.status-running .run-status-label { color: #14b8a6; }
+.run-status-badge.status-done .run-status-label { color: #10b981; }
+.run-status-phase { color: #6b7280; font-style: italic; }
+.run-status-calls { color: #4b5563; }
+.run-status-cost { color: #14b8a6; background: rgba(20,184,166,0.12); padding: 1px 6px; border-radius: 8px; }
+@keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(1.3); } }
+.generate-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: #e5e7eb; margin: 0; }
+.generate-sub { font-size: 12px; color: #6b7280; margin: 0; font-family: 'JetBrains Mono', monospace; }
+.generate-body { flex: 1; display: flex; gap: 24px; overflow: hidden; min-height: 0; }
+.gen-col { display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+.sections-col { flex: 1; min-width: 0; overflow-y: auto; }
+.run-col { flex: 0 0 380px; min-width: 320px; overflow-y: auto; }
+.graph-inline-col { flex: 1; min-width: 0; overflow: hidden; }
+.gen-col-title {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #9ca3af; display: flex; align-items: center;
+  padding-bottom: 8px; border-bottom: 1px solid #1f2937; flex-shrink: 0;
+}
 </style>

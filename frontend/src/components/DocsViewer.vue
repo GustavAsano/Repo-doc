@@ -43,7 +43,8 @@ const bust = ref(0);
 
 const iframeSrc = computed(() => {
   if (!store.docsUrl) return '';
-  const url = new URL(store.docsUrl);
+  const base = store.docsUrl.startsWith('http') ? store.docsUrl : window.location.origin + store.docsUrl;
+  const url = new URL(base);
   if (bust.value > 0) url.searchParams.set('_v', String(bust.value));
   return url.toString();
 });

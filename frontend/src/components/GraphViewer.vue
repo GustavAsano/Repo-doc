@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import { useAppStore } from '@/stores/store';
 import { getGraph } from '@/services/backend';
 
@@ -63,10 +63,12 @@ async function loadGraph() {
     store.graphData = data;
     if (data) {
       graphLoaded.value = true;
+      await nextTick(); // wait for cyEl to mount before rendering
       await renderGraph(data);
     }
-  } catch { /* not critical */ }
-  finally { loading.value = false; }
+  } catch (err) {
+    console.warn('[GraphViewer] loadGraph failed:', err);
+  } finally { loading.value = false; }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -166,10 +168,13 @@ async function renderGraph(data: any) {
 function fit() { cy?.fit(undefined, 20); }
 function zoom(factor: number) { cy?.zoom(cy.zoom() * factor); cy?.center(); }
 
-watch(() => store.repoState?.docs_generated, (v) => { if (v) loadGraph(); });
-watch(() => store.repoState?.repo_name, () => { graphLoaded.value = false; store.graphData = null; });
+watch(() => store.repoState?.repo_name, (name: string | undefined, prev: string | undefined) => {
+  if (!name) { graphLoaded.value = false; store.graphData = null; return; }
+  if (name !== prev) { graphLoaded.value = false; store.graphData = null; }
+  loadGraph();
+});
 
-onMounted(() => { if (store.repoState?.docs_generated) loadGraph(); });
+onMounted(() => { if (store.repoState?.repo_name) loadGraph(); });
 onBeforeUnmount(() => { cy?.destroy(); });
 </script>
 
