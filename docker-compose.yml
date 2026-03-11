@@ -1,0 +1,49 @@
+services:
+
+  # Backend API
+  repo-doc-backend:
+    restart: always
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    hostname: repo-doc-backend
+    command: "sh entrypoint.sh"
+    environment:
+      - BACKEND_DEBUG=false
+      - BACKEND_PORT=8000
+      - APP_DATA_DIR=/app/data
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - API_KEY=${API_KEY}
+    expose:
+      - 8000
+    volumes:
+      - repo-doc-data:/app/data
+
+  # Frontend
+  repo-doc-ui:
+    restart: always
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - 'VITE_APP_BACKEND_HOST='
+        - 'VITE_APP_BACKEND_PORT='
+        - 'VITE_APP_API_KEY=${API_KEY}'
+        - 'VITE_APP_BACKEND_API_BASE='
+    hostname: repo-doc-ui
+    environment:
+      - 'UI_PORT=3000'
+      - 'VITE_APP_BACKEND_HOST='
+      - 'VITE_APP_BACKEND_PORT='
+      - 'VITE_APP_API_KEY=${API_KEY}'
+    ports:
+      - 3000:3000
+    depends_on:
+      - repo-doc-backend
+
+volumes:
+  repo-doc-data:

@@ -1,0 +1,1 @@
+Place here views of your application. Equivalent to Djangos urls.py + views.py

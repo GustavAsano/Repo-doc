@@ -1,0 +1,37 @@
+services:
+
+  # API
+  example-backend:
+    image: example-backend-dev
+    extends:
+      file: docker-compose.yml
+      service: example-backend
+    build:
+      context: ./backend
+      dockerfile: dev.Dockerfile
+      # args:
+      #   - SSH_CONFIG=${SSH_CONFIG}
+      #   - SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY}
+    volumes:
+      - './backend:/app'
+    environment:
+      - BACKEND_DEBUG=true
+    ports:
+      - 8000:8000
+  # Frontend
+  example-ui:
+    image: example-ui-dev
+    extends:
+      file: docker-compose.yml
+      service: example-ui
+    build:
+      context: ./frontend
+      dockerfile: dev.Dockerfile
+    volumes:
+      - './frontend:/app'
+    environment:
+      - 'VITE_APP_BACKEND_HOST='
+      - 'VITE_APP_BACKEND_PORT=8000'
+      - 'VITE_APP_API_KEY=${API_KEY}'
+    ports:
+      - 3000:3000

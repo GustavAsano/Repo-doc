@@ -1,0 +1,7 @@
+version: 0.2
+
+run-as: ubuntu
+
+env:
+  variables:
+    AWS_REGION: eu-west-1

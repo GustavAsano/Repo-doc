@@ -1,0 +1,3 @@
+# Frontend
+
+This directory contains the frontend code for the application. It includes the Vue.js application, the Vuetify UI, and the Pinia state management. It is managed with bun. If you want to add dependencies from the within the hosting environment to package.json and node_modules, you must [install](https://bun.sh/docs/installation) the bun tooling. You can also run a development server and attach a terminal to the frontend container, where bun is available.
