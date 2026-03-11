@@ -1,5 +1,6 @@
 from pathlib import Path
 import zipfile
+import tarfile
 import tempfile
 import re
 import subprocess
@@ -26,20 +27,55 @@ def detect_source_type(source: str) -> str:
 
 
 
+def _stem_of_archive(p: Path) -> str:
+    """Return filename without all archive extensions (e.g. foo.tar.gz -> foo)."""
+    name = p.name
+    for ext in (".tar.gz", ".tar.bz2", ".tar.xz", ".tar.zst"):
+        if name.endswith(ext):
+            return name[: -len(ext)]
+    return p.stem
+
+
 def load_from_zip(zip_path: str) -> str:
-    zip_path = Path(zip_path).resolve()
-    repo_name = zip_path.stem
+    """Extract any supported archive format: .zip, .tar, .tar.gz/.tgz, .tar.bz2, .tar.xz, .7z"""
+    arc_path = Path(zip_path).resolve()
+    repo_name = _stem_of_archive(arc_path)
     target_dir = IN_DIR / repo_name
     owner = None
 
-    # Remove existing copy
     if target_dir.exists():
         shutil.rmtree(target_dir)
-
     target_dir.mkdir(parents=True)
 
-    with zipfile.ZipFile(zip_path, "r") as zip_ref:
-        zip_ref.extractall(target_dir)
+    name_lower = arc_path.name.lower()
+
+    if name_lower.endswith(".zip"):
+        with zipfile.ZipFile(arc_path, "r") as zf:
+            zf.extractall(target_dir)
+
+    elif tarfile.is_tarfile(arc_path):
+        with tarfile.open(arc_path, "r:*") as tf:
+            tf.extractall(target_dir)
+
+    elif name_lower.endswith(".7z"):
+        try:
+            import py7zr
+            with py7zr.SevenZipFile(arc_path, mode="r") as sz:
+                sz.extractall(path=target_dir)
+        except ImportError:
+            raise RuntimeError("7z support requires py7zr (not installed)")
+
+    else:
+        raise ValueError(f"Unsupported archive format: {arc_path.name}")
+
+    # If archive contained a single top-level folder, unwrap it
+    contents = list(target_dir.iterdir())
+    if len(contents) == 1 and contents[0].is_dir():
+        inner = contents[0]
+        tmp = target_dir.parent / (target_dir.name + "_tmp")
+        inner.rename(tmp)
+        target_dir.rmdir()
+        tmp.rename(target_dir)
 
     return str(target_dir), repo_name, owner
 

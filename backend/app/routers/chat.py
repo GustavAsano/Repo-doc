@@ -15,11 +15,19 @@ from app.core.state import (
     WORKSPACE_DIR,
     _normalize_language,
     clear_chat_history,
+    list_chat_sessions,
     load_chat_history,
     resolve_code_json,
     save_chat_history,
 )
-from app.schemas.repo_doc import ChatHistoryResponse, ChatMessage, ChatRequest, ChatResponse
+from app.schemas.repo_doc import (
+    ChatHistoryResponse,
+    ChatMessage,
+    ChatRequest,
+    ChatResponse,
+    ChatSessionInfo,
+    ChatSessionsResponse,
+)
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
@@ -146,21 +154,27 @@ async def chat_message(body: ChatRequest):
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"LLM call failed: {exc}")
 
-    history = load_chat_history(body.repo_name)
+    history = load_chat_history(body.repo_name, body.session_id)
     history.append({"role": "user", "content": body.question})
     history.append({"role": "assistant", "content": answer})
-    save_chat_history(body.repo_name, history)
+    save_chat_history(body.repo_name, history, body.session_id)
 
     return ChatResponse(answer=answer, history=[ChatMessage(**m) for m in history])
 
 
+@router.get("/sessions/{repo_name}", response_model=ChatSessionsResponse, summary="List chat sessions for a repository")
+async def get_sessions(repo_name: str):
+    sessions = list_chat_sessions(repo_name)
+    return ChatSessionsResponse(repo_name=repo_name, sessions=[ChatSessionInfo(**s) for s in sessions])
+
+
 @router.get("/history/{repo_name}", response_model=ChatHistoryResponse, summary="Get chat history for a repository")
-async def get_history(repo_name: str):
-    history = load_chat_history(repo_name)
+async def get_history(repo_name: str, session_id: str | None = None):
+    history = load_chat_history(repo_name, session_id)
     return ChatHistoryResponse(repo_name=repo_name, history=[ChatMessage(**m) for m in history])
 
 
-@router.delete("/history/{repo_name}", summary="Clear chat history for a repository")
-async def delete_history(repo_name: str):
-    clear_chat_history(repo_name)
-    return {"deleted": True, "repo_name": repo_name}
+@router.delete("/history/{repo_name}", summary="Clear/delete a chat session")
+async def delete_history(repo_name: str, session_id: str | None = None):
+    clear_chat_history(repo_name, session_id)
+    return {"deleted": True, "repo_name": repo_name, "session_id": session_id}

@@ -305,7 +305,7 @@ getLibrary('functional').then((entries) => { store.functionalLibrary = entries; 
 .generate-body { flex: 1; display: flex; gap: 24px; overflow: hidden; min-height: 0; }
 .gen-col { display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
 .sections-col { flex: 1; min-width: 0; overflow-y: auto; }
-.run-col { flex: 0 0 380px; min-width: 320px; overflow-y: auto; }
+.run-col { flex: 1; min-width: 320px; overflow-y: auto; }
 .graph-inline-col { flex: 1; min-width: 0; overflow: hidden; }
 .gen-col-title {
   font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase;

@@ -15,10 +15,14 @@ export const PROVIDER_MODELS: Record<LLMProvider, string[]> = {
   gemini: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-2.0-pro'],
   openai: ['gpt-4o', 'gpt-4o-mini', 'gpt-5-mini', 'gpt-5-nano'],
   bedrock: [
-    'anthropic.claude-3-5-sonnet-20241022-v2:0',
-    'anthropic.claude-3-5-haiku-20241022-v1:0',
+    'moonshotai.kimi-k2.5',
+    'deepseek.v3.2',
+    'zai.glm-4.7',
+    'amazon.nova-pro-v1:0',
+    'amazon.nova-2-lite-v1:0',
+    'mistral.devstral-2-123b',
     'anthropic.claude-haiku-4-5-20251001-v1:0',
-    'moonshot.kimi-k2-thinking',
+    'anthropic.claude-sonnet-4-6',
   ],
 };
 

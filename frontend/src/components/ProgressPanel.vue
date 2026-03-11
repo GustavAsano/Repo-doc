@@ -27,29 +27,25 @@
     </div>
 
     <!-- Generate button -->
-    <v-btn
-      v-if="!store.generating"
-      block
-      color="teal"
-      :loading="store.loading"
-      :disabled="!canGenerate || store.generating"
-      class="gen-btn"
-      @click="generate"
-    >
-      <v-icon start>mdi-file-document-edit-outline</v-icon>
-      Generate docs
-    </v-btn>
-    <v-btn
-      v-else
-      block
-      variant="outlined"
-      color="red-lighten-2"
-      class="gen-btn"
-      @click="cancel"
-    >
-      <v-icon start>mdi-stop-circle-outline</v-icon>
-      Cancel
-    </v-btn>
+    <div class="gen-btn-row">
+      <button
+        v-if="!store.generating"
+        class="gen-btn"
+        :disabled="!canGenerate || store.loading"
+        @click="generate"
+      >
+        <v-icon size="14" class="mr-1">mdi-file-document-edit-outline</v-icon>
+        Generate docs
+      </button>
+      <button
+        v-else
+        class="gen-btn cancel-btn"
+        @click="cancel"
+      >
+        <v-icon size="14" class="mr-1">mdi-stop-circle-outline</v-icon>
+        Cancel
+      </button>
+    </div>
 
     <!-- Event log -->
     <div v-if="store.progressEvents.length > 0" class="event-log" ref="logEl">
@@ -91,12 +87,32 @@ function eventIcon(event: string) {
   const m: Record<string, string> = { plan: '⚡', call_start: '→', call_end: '✓', done: '✦', error: '✗' };
   return m[event] ?? '·';
 }
+function sectionLabel(ev: Record<string, unknown>): string {
+  const phase = String(ev.phase ?? '');
+  const section = ev.section != null ? String(ev.section).toUpperCase() : null;
+  const sidx = ev.section_index != null ? ev.section_index : null;
+  const stotal = ev.total_sections != null ? ev.total_sections : null;
+  const isFunctional = phase.startsWith('functional_');
+  const typePrefix = isFunctional ? 'Functional · ' : '';
+  if (section && sidx != null && stotal != null)
+    return `${typePrefix}Writing ${section} (${sidx}/${stotal})`;
+  if (section)
+    return `${typePrefix}Writing ${section}`;
+  if (phase === 'section_writing' || phase === 'functional_section_writing')
+    return `${typePrefix}Writing section`;
+  if (phase === 'final_cleanup' || phase === 'functional_final_cleanup')
+    return `${typePrefix}Final cleanup`;
+  if (phase === 'evidence_extraction' || phase === 'functional_chunk_extraction')
+    return 'Extracting evidence';
+  return phase;
+}
+
 function eventLabel(ev: Record<string, unknown>) {
   if (ev.event === 'plan') return `Plan: ${ev.total_calls} calls`;
-  if (ev.event === 'call_start') return `[${ev.current_call}/${ev.total_calls}] ${ev.phase ?? ''}`;
+  if (ev.event === 'call_start') return `[${ev.current_call}/${ev.total_calls}] ${sectionLabel(ev)}`;
   if (ev.event === 'call_end') {
     const cost = ev.call_cost_usd != null ? ` · $${(ev.call_cost_usd as number).toFixed(4)}` : '';
-    return `Done [${ev.current_call}/${ev.total_calls}]${cost}`;
+    return `✓ ${sectionLabel(ev)} [${ev.current_call}/${ev.total_calls}]${cost}`;
   }
   if (ev.event === 'done') return 'Documentation complete';
   if (ev.event === 'error') return `Error: ${ev.message}`;
@@ -172,9 +188,22 @@ function cancel() {
 .prog-bar-fill.done { background: #10b981; }
 .prog-counts { display: flex; justify-content: space-between; font-size: 10px; color: #4b5563; font-family: 'JetBrains Mono', monospace; }
 .prog-phase { color: #6b7280; font-style: italic; }
-.gen-btn { font-family: 'JetBrains Mono', monospace !important; font-size: 12px !important; }
+.gen-btn-row { display: flex; }
+.gen-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 7px 18px; border-radius: 6px; border: 1px solid #14b8a6;
+  background: rgba(20,184,166,0.12); color: #14b8a6;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s, border-color 0.15s;
+  letter-spacing: 0.04em;
+}
+.gen-btn:hover:not(:disabled) { background: rgba(20,184,166,0.22); }
+.gen-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.cancel-btn { border-color: #f87171; background: rgba(248,113,113,0.1); color: #f87171; }
+.cancel-btn:hover { background: rgba(248,113,113,0.2); }
+.progress-panel { flex: 1; }
 .event-log {
-  max-height: 200px; overflow-y: auto; background: #0d1117;
+  flex: 1; min-height: 120px; max-height: 480px; overflow-y: auto; background: #0d1117;
   border: 1px solid #1f2937; border-radius: 6px; padding: 8px;
   display: flex; flex-direction: column; gap: 3px;
 }

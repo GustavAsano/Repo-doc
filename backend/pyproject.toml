@@ -46,6 +46,7 @@ dependencies = [
     # --- utilities ---
     "pillow>=10.4.0",
     "numpy>=1.26.4",
+    "py7zr>=0.20.0",
 ]
 
 packages = [

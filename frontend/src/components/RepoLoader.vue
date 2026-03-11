@@ -27,20 +27,7 @@
       />
     </div>
 
-    <!-- Local folder -->
-    <div v-if="store.sourceType === 'local_folder'" class="input-block">
-      <v-text-field
-        v-model="store.localPath"
-        placeholder="/path/to/repository"
-        density="compact"
-        variant="outlined"
-        hide-details
-        class="dark-input"
-        prepend-inner-icon="mdi-folder-outline"
-      />
-    </div>
-
-    <!-- ZIP upload -->
+    <!-- Archive upload -->
     <div v-if="store.sourceType === 'zip'" class="input-block">
       <div
         class="drop-zone"
@@ -50,10 +37,10 @@
         @drop.prevent="onDrop"
         @click="fileInput?.click()"
       >
-        <input ref="fileInput" type="file" accept=".zip" style="display:none" @change="onFileChange" />
+        <input ref="fileInput" type="file" accept=".zip,.tar,.tar.gz,.tgz,.tar.bz2,.tar.xz,.7z" style="display:none" @change="onFileChange" />
         <v-icon size="28" color="teal" class="mb-2">mdi-archive-arrow-up-outline</v-icon>
         <div v-if="store.zipFile" class="zip-name">{{ store.zipFile.name }}</div>
-        <div v-else class="drop-hint">Drop .zip here or click to browse</div>
+        <div v-else class="drop-hint">Drop archive here or click to browse<br><span class="fmt-hint">.zip · .tar.gz · .tgz · .tar.bz2 · .tar.xz · .7z</span></div>
       </div>
     </div>
 
@@ -137,7 +124,6 @@ import { LANGUAGES } from '@/types/types';
 import axios from 'axios';
 import {
   loadRepoFromUrl,
-  loadRepoFromFolder,
   uploadZip,
   loadRepoFromZip,
   activateLibraryEntry,
@@ -150,10 +136,9 @@ const dragging = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
 
 const sourceOptions = [
-  { value: 'git_url' as const,      label: 'Git URL',    icon: 'mdi-git' },
-  { value: 'local_folder' as const, label: 'Local',      icon: 'mdi-folder-outline' },
-  { value: 'zip' as const,          label: 'ZIP',        icon: 'mdi-archive-outline' },
-  { value: 'library' as const,      label: 'Library',    icon: 'mdi-bookshelf' },
+  { value: 'git_url' as const, label: 'Git URL', icon: 'mdi-git' },
+  { value: 'zip' as const,     label: 'Archive', icon: 'mdi-archive-outline' },
+  { value: 'library' as const, label: 'Library', icon: 'mdi-bookshelf' },
 ];
 
 const modes = [
@@ -165,7 +150,6 @@ const modes = [
 const canLoad = computed(() => {
   if (store.loading) return false;
   if (store.sourceType === 'git_url') return !!store.gitUrl.trim();
-  if (store.sourceType === 'local_folder') return !!store.localPath.trim();
   if (store.sourceType === 'zip') return !!store.zipFile;
   if (store.sourceType === 'library') return !!store.selectedLibraryKey;
   return false;
@@ -175,10 +159,15 @@ function onFileChange(e: Event) {
   const f = (e.target as HTMLInputElement).files?.[0];
   if (f) store.zipFile = f;
 }
+const ARCHIVE_EXTS = ['.zip', '.tar.gz', '.tgz', '.tar.bz2', '.tar.xz', '.tar', '.7z'];
+function isArchive(name: string) {
+  const n = name.toLowerCase();
+  return ARCHIVE_EXTS.some(ext => n.endsWith(ext));
+}
 function onDrop(e: DragEvent) {
   dragging.value = false;
   const f = e.dataTransfer?.files?.[0];
-  if (f?.name.endsWith('.zip')) store.zipFile = f;
+  if (f && isArchive(f.name)) store.zipFile = f;
 }
 function formatDate(d?: string) {
   if (!d) return '';
@@ -192,8 +181,6 @@ async function load() {
     let state;
     if (store.sourceType === 'git_url') {
       state = await loadRepoFromUrl(store.gitUrl.trim(), store.language);
-    } else if (store.sourceType === 'local_folder') {
-      state = await loadRepoFromFolder(store.localPath.trim(), store.language);
     } else if (store.sourceType === 'zip' && store.zipFile) {
       const upload = await uploadZip(store.zipFile);
       store.zipUploadedPath = upload.path;
@@ -241,7 +228,8 @@ async function load() {
 }
 .drop-zone:hover, .drop-zone.drag-over { border-color: #14b8a6; background: rgba(20,184,166,0.05); }
 .zip-name { color: #14b8a6; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
-.drop-hint { color: #6b7280; font-size: 12px; }
+.drop-hint { color: #6b7280; font-size: 12px; line-height: 1.6; }
+.fmt-hint { color: #4b5563; font-size: 10px; font-family: 'JetBrains Mono', monospace; }
 .library-list { display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto; }
 .lib-entry {
   padding: 10px 12px; border-radius: 6px; border: 1px solid #374151;

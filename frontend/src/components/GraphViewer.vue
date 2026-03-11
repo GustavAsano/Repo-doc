@@ -58,7 +58,8 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
-import type { ComponentPublicInstance } from 'vue';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ComponentPublicInstance = any;
 import { useAppStore } from '@/stores/store';
 import { getGraph } from '@/services/backend';
 
@@ -85,10 +86,21 @@ let allNodes: Record<string, unknown>[] = [];
 let allEdges: Record<string, unknown>[] = [];
 
 function groupHeight(nodeCount: number): number {
-  if (nodeCount <= 10) return 260;
-  if (nodeCount <= 30) return 360;
-  if (nodeCount <= 80) return 460;
-  return 560;
+  if (nodeCount <= 8)  return 280;
+  if (nodeCount <= 20) return 400;
+  if (nodeCount <= 50) return 540;
+  if (nodeCount <= 100) return 680;
+  return 820;
+}
+
+function shortLabel(n: Record<string, unknown>): string {
+  // Prefer explicit name field over full path
+  const name = String(n.name ?? n.nome ?? '').trim();
+  if (name && name !== String(n.path ?? '')) return name;
+  // Fall back to last segment of path
+  const path = String(n.path ?? n.label ?? n.id ?? '').replace(/\\/g, '/');
+  const segments = path.split('/').filter(Boolean);
+  return segments[segments.length - 1] || path;
 }
 
 function setGroupEl(key: string, el: Element | ComponentPublicInstance | null) {
@@ -105,7 +117,7 @@ function buildElements(nodes: Record<string, unknown>[], edges: Record<string, u
     group: 'nodes',
     data: {
       id: String(n.id ?? n.path ?? ''),
-      label: String(n.name ?? n.nome ?? n.label ?? n.path ?? n.id ?? ''),
+      label: shortLabel(n),
       path: String(n.path ?? ''),
       tipo: String(n.tipo ?? n.kind ?? ''),
     },
@@ -133,14 +145,17 @@ function cyStyle() {
         'border-width': 1,
         'label': 'data(label)',
         'color': '#e2e8f0',
-        'font-size': '10px',
+        'font-size': '9px',
         'font-family': 'JetBrains Mono, monospace',
         'text-valign': 'bottom',
-        'text-margin-y': 5,
+        'text-halign': 'center',
+        'text-margin-y': 4,
         'text-outline-color': '#080c12',
         'text-outline-width': 2,
-        'width': 22,
-        'height': 22,
+        'text-wrap': 'ellipsis',
+        'text-max-width': '90px',
+        'width': 26,
+        'height': 26,
       },
     },
     {
@@ -205,9 +220,14 @@ async function renderGroup(key: string, nodes: Record<string, unknown>[], edges:
     layout: {
       name: 'cose',
       animate: false,
-      nodeRepulsion: () => 10000,
-      idealEdgeLength: () => 90,
-      padding: 28,
+      nodeRepulsion: () => 80000,
+      idealEdgeLength: () => 140,
+      nodeOverlap: 24,
+      gravity: 0.15,
+      numIter: 1000,
+      padding: 40,
+      randomize: true,
+      componentSpacing: 80,
     },
     wheelSensitivity: 0.2,
   });
@@ -284,7 +304,7 @@ async function loadGraph() {
 
     // Start with General expanded, all folders collapsed
     expanded['__all__'] = true;
-    groups.value.forEach((g: GraphGroup) => { expanded[g.name] = false; });
+    groups.value.forEach((g) => { expanded[(g as GraphGroup).name] = false; });
 
     loading.value = false;
     await nextTick();

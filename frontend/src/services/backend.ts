@@ -200,12 +200,14 @@ export const sendChatMessage = async (
   question: string,
   language: Language,
   settings: LLMSettings,
+  sessionId?: string,
 ): Promise<{ answer: string; history: ChatMessage[] }> => {
   const { data } = await axios.post(
     getEndpoint('/chat/message'),
     {
       repo_name: repoName,
       question,
+      session_id: sessionId ?? null,
       language,
       provider: settings.provider,
       model: settings.model,
@@ -217,18 +219,27 @@ export const sendChatMessage = async (
   return data;
 };
 
-export const getChatHistory = async (repoName: string): Promise<ChatMessage[]> => {
+export const getChatHistory = async (repoName: string, sessionId?: string): Promise<ChatMessage[]> => {
   const { data } = await axios.get(getEndpoint(`/chat/history/${encodeURIComponent(repoName)}`), {
+    params: sessionId ? { session_id: sessionId } : {},
     headers: headers(),
   });
   return data.history ?? [];
 };
 
-export const clearChatHistory = async (repoName: string) => {
+export const deleteChatSession = async (repoName: string, sessionId?: string) => {
   const { data } = await axios.delete(getEndpoint(`/chat/history/${encodeURIComponent(repoName)}`), {
+    params: sessionId ? { session_id: sessionId } : {},
     headers: headers(),
   });
   return data;
+};
+
+export const listChatSessions = async (repoName: string): Promise<{ session_id: string; title: string; updated_at: number }[]> => {
+  const { data } = await axios.get(getEndpoint(`/chat/sessions/${encodeURIComponent(repoName)}`), {
+    headers: headers(),
+  });
+  return data.sessions ?? [];
 };
 
 // ─── Graph ─────────────────────────────────────────────────────────────────

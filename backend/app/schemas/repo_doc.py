@@ -122,6 +122,7 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     repo_name: str
     question: str
+    session_id: Optional[str] = None
     language: str = "EN-US"
     provider: str = "gemini"
     model: str = "gemini-2.5-flash"
@@ -137,6 +138,17 @@ class ChatResponse(BaseModel):
 class ChatHistoryResponse(BaseModel):
     repo_name: str
     history: list[ChatMessage]
+
+
+class ChatSessionInfo(BaseModel):
+    session_id: str
+    title: str
+    updated_at: float
+
+
+class ChatSessionsResponse(BaseModel):
+    repo_name: str
+    sessions: list[ChatSessionInfo]
 
 
 # ---------------------------------------------------------------------------

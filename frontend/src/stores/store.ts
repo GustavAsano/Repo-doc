@@ -61,6 +61,8 @@ export interface AppStore {
   // Chat
   chatHistory: ChatMessage[];
   chatLoading: boolean;
+  chatSessions: { session_id: string; title: string; updated_at: number }[];
+  activeChatSessionId: string;
   // Graph
   graphData: unknown;
   // UI step
@@ -103,6 +105,8 @@ export const useAppStore = defineStore('app', {
     mkdocsPort: null,
     chatHistory: [],
     chatLoading: false,
+    chatSessions: [],
+    activeChatSessionId: '',
     graphData: null,
     activeTab: 0,
   }),
@@ -143,6 +147,14 @@ export const useAppStore = defineStore('app', {
     resetSections() {
       this.techSections = { ...DEFAULT_TECH_SECTIONS };
       this.funcSections = { ...DEFAULT_FUNC_SECTIONS };
+    },
+    addSection(tab: 'tech' | 'func', key: string, title: string, description: string) {
+      const target = tab === 'tech' ? this.techSections : this.funcSections;
+      target[key] = { title, description, enabled: true };
+    },
+    removeSection(tab: 'tech' | 'func', key: string) {
+      const target = tab === 'tech' ? this.techSections : this.funcSections;
+      delete target[key];
     },
   },
 });

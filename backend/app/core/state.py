@@ -474,9 +474,15 @@ def activate_repo_assets(entry: dict, doc_variant: str = "technical") -> bool:
 # Chat history persistence
 # ---------------------------------------------------------------------------
 
-def load_chat_history(repo_name: str) -> list[dict]:
+def _chat_path(repo_name: str, session_id: Optional[str] = None) -> Path:
+    if session_id:
+        return CHAT_HISTORY_DIR / f"{repo_name}__{session_id}.json"
+    return CHAT_HISTORY_DIR / f"{repo_name}.json"
+
+
+def load_chat_history(repo_name: str, session_id: Optional[str] = None) -> list[dict]:
     try:
-        path = CHAT_HISTORY_DIR / f"{repo_name}.json"
+        path = _chat_path(repo_name, session_id)
         if path.exists():
             data = json.loads(path.read_text(encoding="utf-8"))
             if isinstance(data, list):
@@ -486,23 +492,52 @@ def load_chat_history(repo_name: str) -> list[dict]:
     return []
 
 
-def save_chat_history(repo_name: str, history: list[dict]) -> None:
+def save_chat_history(repo_name: str, history: list[dict], session_id: Optional[str] = None) -> None:
     try:
         CHAT_HISTORY_DIR.mkdir(parents=True, exist_ok=True)
         trimmed = history[-MAX_CHAT_HISTORY:]
-        path = CHAT_HISTORY_DIR / f"{repo_name}.json"
+        path = _chat_path(repo_name, session_id)
         path.write_text(json.dumps(trimmed, ensure_ascii=False), encoding="utf-8")
     except Exception:
         pass
 
 
-def clear_chat_history(repo_name: str) -> None:
+def clear_chat_history(repo_name: str, session_id: Optional[str] = None) -> None:
     try:
-        path = CHAT_HISTORY_DIR / f"{repo_name}.json"
+        path = _chat_path(repo_name, session_id)
         if path.exists():
             path.unlink()
     except Exception:
         pass
+
+
+def list_chat_sessions(repo_name: str) -> list[dict]:
+    """Return [{session_id, title, updated_at}] for all sessions of this repo, newest first."""
+    try:
+        CHAT_HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+        sessions = []
+        for f in CHAT_HISTORY_DIR.glob(f"{repo_name}*.json"):
+            stem = f.stem  # e.g. "myrepo" or "myrepo__<uuid>"
+            if stem == repo_name:
+                sid = "__default__"
+            elif stem.startswith(repo_name + "__"):
+                sid = stem[len(repo_name) + 2:]
+            else:
+                continue
+            try:
+                history = json.loads(f.read_text(encoding="utf-8"))
+                first_user = next((m["content"] for m in history if m.get("role") == "user"), "")
+                sessions.append({
+                    "session_id": sid,
+                    "title": first_user[:60] if first_user else "New chat",
+                    "updated_at": f.stat().st_mtime,
+                })
+            except Exception:
+                continue
+        sessions.sort(key=lambda s: s["updated_at"], reverse=True)
+        return sessions
+    except Exception:
+        return []
 
 
 # ---------------------------------------------------------------------------

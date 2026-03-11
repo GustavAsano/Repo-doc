@@ -3421,6 +3421,9 @@ def generate_doc(
                 current_call=current_call,
                 total_calls=total_calls_hint,
                 phase=phase_name,
+                section=section_key,
+                section_index=section_idx,
+                total_sections=total_sections,
             )
             _ensure_call_limits(estimated_call)
             section_text, call_cost_usd = _invoke_section_writer_pass(
@@ -3439,6 +3442,9 @@ def generate_doc(
                 call_cost_usd=normalized_call_cost,
                 total_cost_usd=total_cost_usd,
                 cost_available=(cost_samples > 0),
+                section=section_key,
+                section_index=section_idx,
+                total_sections=total_sections,
             )
             if checkpoint_phase:
                 extra_payload = {}
@@ -4347,6 +4353,9 @@ def generate_functional_doc_from_technical(
                 current_call=current_call,
                 total_calls=total_calls_hint,
                 phase="functional_section_writing",
+                section=section_key,
+                section_index=section_idx,
+                total_sections=len(section_keys),
             )
             _ensure_call_limits(estimated_call)
             section_text, call_cost_usd = _invoke_functional_section_doc_from_context_pass(
@@ -4368,6 +4377,9 @@ def generate_functional_doc_from_technical(
                 call_cost_usd=normalized_call_cost,
                 total_cost_usd=total_cost_usd,
                 cost_available=(cost_samples > 0),
+                section=section_key,
+                section_index=section_idx,
+                total_sections=len(section_keys),
             )
             _save_resume_phase(
                 "functional_section_writing",
