@@ -74,3 +74,13 @@ watch(() => store.docsUrl, () => { iframeLoaded.value = false; });
 .ph-text { font-size: 12px; color: #4b5563; font-family: 'JetBrains Mono', monospace; text-align: center; max-width: 260px; }
 .docs-iframe { flex: 1; width: 100%; border: none; background: #fff; }
 </style>
+
+<style>
+.v-theme--light .docs-toolbar { background: #ffffff; border-bottom-color: #e2e8f0; }
+.v-theme--light .docs-label { color: #475569; }
+.v-theme--light .tool-btn { border-color: #e2e8f0; color: #94a3b8; }
+.v-theme--light .tool-btn:hover { border-color: #94a3b8; color: #0f172a; }
+.v-theme--light .port-badge { color: #94a3b8; }
+.v-theme--light .docs-placeholder { background: #f8fafc; }
+.v-theme--light .ph-text { color: #94a3b8; }
+</style>

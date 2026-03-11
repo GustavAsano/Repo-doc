@@ -17,6 +17,17 @@ export default createVuetify({
           'on-background': '#e5e7eb',
         },
       },
+      light: {
+        dark: false,
+        colors: {
+          primary: '#0f766e',
+          secondary: '#e2e8f0',
+          surface: '#ffffff',
+          background: '#f1f5f9',
+          'on-surface': '#0f172a',
+          'on-background': '#0f172a',
+        },
+      },
     },
   },
 });

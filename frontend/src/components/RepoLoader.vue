@@ -250,3 +250,24 @@ async function load() {
 .opt-label { font-size: 11px; color: #6b7280; font-family: 'JetBrains Mono', monospace; }
 .load-btn { font-family: 'JetBrains Mono', monospace !important; font-size: 12px !important; letter-spacing: 0.04em !important; }
 </style>
+
+<style>
+.v-theme--light .tab-btn              { border-color: #cbd5e1; color: #475569; background: transparent; }
+.v-theme--light .tab-btn:hover        { border-color: #94a3b8; color: #0f172a; }
+.v-theme--light .tab-btn.active       { border-color: #0f766e; color: #0f766e; background: rgba(15,118,110,0.08); }
+.v-theme--light .drop-zone            { border-color: #cbd5e1; }
+.v-theme--light .drop-zone:hover,
+.v-theme--light .drop-zone.drag-over  { border-color: #0f766e; background: rgba(15,118,110,0.04); }
+.v-theme--light .zip-name             { color: #0f766e; }
+.v-theme--light .drop-hint            { color: #475569; }
+.v-theme--light .fmt-hint             { color: #64748b; }
+.v-theme--light .lib-entry            { border-color: #e2e8f0; }
+.v-theme--light .lib-entry:hover      { border-color: #94a3b8; background: #f8fafc; }
+.v-theme--light .lib-entry.selected   { border-color: #0f766e; background: rgba(15,118,110,0.06); }
+.v-theme--light .lib-name             { color: #0f172a; }
+.v-theme--light .badge.lang           { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+.v-theme--light .badge.tech           { background: rgba(15,118,110,0.1); color: #0f766e; }
+.v-theme--light .lib-date             { color: #64748b; }
+.v-theme--light .empty-library        { color: #64748b; }
+.v-theme--light .opt-label            { color: #475569; }
+</style>

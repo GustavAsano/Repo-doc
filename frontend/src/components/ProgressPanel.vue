@@ -215,3 +215,21 @@ function cancel() {
 .ev-line.done .ev-msg { color: #10b981; font-weight: 600; }
 .ev-line.error .ev-msg { color: #f87171; }
 </style>
+
+<style>
+.v-theme--light .prog-title { color: #475569; }
+.v-theme--light .pulse-dot { background: #cbd5e1; }
+.v-theme--light .cost-badge { color: #0f766e; background: rgba(15,118,110,0.1); }
+.v-theme--light .prog-bar-wrap { background: #e2e8f0; }
+.v-theme--light .prog-counts { color: #94a3b8; }
+.v-theme--light .prog-phase { color: #64748b; }
+.v-theme--light .gen-btn { border-color: #0f766e; background: rgba(15,118,110,0.08); color: #0f766e; }
+.v-theme--light .gen-btn:hover:not(:disabled) { background: rgba(15,118,110,0.15); }
+.v-theme--light .event-log { background: #f8fafc; border-color: #e2e8f0; }
+.v-theme--light .ev-line { color: #94a3b8; }
+.v-theme--light .ev-line.plan .ev-msg { color: #6366f1; }
+.v-theme--light .ev-line.call_start .ev-msg { color: #475569; }
+.v-theme--light .ev-line.call_end .ev-msg { color: #94a3b8; }
+.v-theme--light .ev-line.done .ev-msg { color: #059669; }
+.v-theme--light .ev-line.error .ev-msg { color: #dc2626; }
+</style>

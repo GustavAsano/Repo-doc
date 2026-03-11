@@ -225,3 +225,24 @@ function reset() {
 
 .enabled-count { font-size: 11px; color: #6b7280; font-family: 'JetBrains Mono', monospace; }
 </style>
+
+<style>
+.v-theme--light .sec-tab { border-color: #e2e8f0; color: #475569; }
+.v-theme--light .sec-tab.active { border-color: #0f766e; color: #0f766e; background: rgba(15,118,110,0.07); }
+.v-theme--light .sec-table { border-color: #e2e8f0; }
+.v-theme--light .sec-header { background: #f8fafc; border-bottom-color: #e2e8f0; color: #94a3b8; }
+.v-theme--light .sec-row { border-bottom-color: #f1f5f9; }
+.v-theme--light .sec-row:hover { background: #f8fafc; }
+.v-theme--light .sec-row.add-row { background: rgba(15,118,110,0.03); }
+.v-theme--light .sec-input { color: #0f172a; }
+.v-theme--light .sec-input::placeholder { color: #cbd5e1; }
+.v-theme--light .sec-input:disabled { color: #cbd5e1; }
+.v-theme--light .sec-input.desc-input { color: #64748b; }
+.v-theme--light .del-btn { color: #cbd5e1; }
+.v-theme--light .confirm-btn { color: #0f766e; }
+.v-theme--light .confirm-btn:hover { color: #0d9488; }
+.v-theme--light .action-btn { border-color: #e2e8f0; color: #475569; }
+.v-theme--light .action-btn:hover { border-color: #0f766e; color: #0f766e; }
+.v-theme--light .action-btn.muted:hover { border-color: #94a3b8; color: #475569; }
+.v-theme--light .enabled-count { color: #94a3b8; }
+</style>

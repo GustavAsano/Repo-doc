@@ -84,8 +84,8 @@
 
     <v-btn
       block
-      :color="store.llmSaved ? 'teal' : 'white'"
-      :variant="store.llmSaved ? 'flat' : 'outlined'"
+      color="teal"
+      variant="flat"
       :loading="saving"
       class="save-btn mt-3"
       @click="save"
@@ -150,4 +150,14 @@ async function save() {
 .field-label { font-size: 11px; color: #9ca3af; font-family: 'JetBrains Mono', monospace; }
 .key-row { display: flex; align-items: center; gap: 12px; }
 .save-btn { font-family: 'JetBrains Mono', monospace !important; font-size: 12px !important; letter-spacing: 0.05em !important; }
+</style>
+
+<style>
+.v-theme--light .section-label  { color: #475569; }
+.v-theme--light .pill            { border-color: #cbd5e1; color: #475569; background: transparent; }
+.v-theme--light .pill:hover      { border-color: #94a3b8; color: #0f172a; }
+.v-theme--light .pill.active     { border-color: #0f766e; color: #0f766e; background: rgba(15,118,110,0.08); }
+.v-theme--light .field-label     { color: #475569; }
+.v-theme--light .save-btn.v-btn--variant-outlined { border-color: #cbd5e1 !important; color: #475569 !important; }
+.v-theme--light .save-btn.v-btn--variant-outlined:hover { border-color: #94a3b8 !important; color: #0f172a !important; }
 </style>

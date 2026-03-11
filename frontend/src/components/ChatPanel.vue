@@ -294,3 +294,31 @@ async function send() {
 .send-btn:hover:not(:disabled) { border-color: #14b8a6; color: #14b8a6; }
 .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
+
+<style>
+.v-theme--light .sessions-sidebar { background: #ffffff; border-right-color: #e2e8f0; }
+.v-theme--light .sessions-header { border-bottom-color: #e2e8f0; }
+.v-theme--light .sessions-title { color: #94a3b8; }
+.v-theme--light .icon-btn { border-color: #e2e8f0; color: #94a3b8; }
+.v-theme--light .icon-btn:hover { border-color: #0f766e; color: #0f766e; }
+.v-theme--light .session-item:hover { background: #f1f5f9; border-color: #e2e8f0; }
+.v-theme--light .session-item.active { background: rgba(15,118,110,0.06); border-color: rgba(15,118,110,0.3); }
+.v-theme--light .session-title { color: #475569; }
+.v-theme--light .session-item.active .session-title { color: #0f766e; }
+.v-theme--light .del-btn { color: #cbd5e1; }
+.v-theme--light .sessions-empty { color: #cbd5e1; }
+.v-theme--light .chat-header { background: #ffffff; border-bottom-color: #e2e8f0; color: #475569; }
+.v-theme--light .messages { background: #f1f5f9; }
+.v-theme--light .chat-empty { color: #94a3b8; }
+.v-theme--light .msg-role { color: #94a3b8; }
+.v-theme--light .message.user .msg-role { color: #0f766e; }
+.v-theme--light .msg-content { background: #ffffff; border-color: #e2e8f0; color: #0f172a; }
+.v-theme--light .message.user .msg-content { background: rgba(15,118,110,0.07); border-color: rgba(15,118,110,0.2); color: #0f172a; }
+.v-theme--light :deep(.code-block) { background: #f1f5f9; border-color: #e2e8f0; color: #475569; }
+.v-theme--light :deep(.inline-code) { background: #e2e8f0; color: #0f766e; }
+.v-theme--light .typing-dots { background: #ffffff; border-color: #e2e8f0; }
+.v-theme--light .typing-dots span { background: #cbd5e1; }
+.v-theme--light .chat-input-row { background: #ffffff; border-top-color: #e2e8f0; }
+.v-theme--light .send-btn { border-color: #e2e8f0; color: #94a3b8; }
+.v-theme--light .send-btn:hover:not(:disabled) { border-color: #0f766e; color: #0f766e; }
+</style>

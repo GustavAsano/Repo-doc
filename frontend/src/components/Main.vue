@@ -313,3 +313,39 @@ getLibrary('functional').then((entries) => { store.functionalLibrary = entries; 
   padding-bottom: 8px; border-bottom: 1px solid #1f2937; flex-shrink: 0;
 }
 </style>
+
+<style>
+/* ── Light theme overrides ── */
+.v-theme--light .app-main { background: #f1f5f9 !important; }
+.v-theme--light .sidebar { background: #ffffff; border-right-color: #e2e8f0; }
+.v-theme--light .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; }
+.v-theme--light .side-section { border-bottom-color: #e2e8f0; }
+.v-theme--light .side-title { color: #64748b; }
+.v-theme--light .side-title:hover { color: #0f172a; }
+.v-theme--light .content { background: #f1f5f9; }
+.v-theme--light .content-tabs { background: #ffffff; border-bottom-color: #e2e8f0; }
+.v-theme--light .c-tab { color: #94a3b8; }
+.v-theme--light .c-tab:hover { color: #475569; }
+.v-theme--light .c-tab.active { color: #0f766e; border-bottom-color: #0f766e; }
+.v-theme--light .welcome-glyph { color: #cbd5e1; }
+.v-theme--light .welcome-h1 { color: #0f172a; }
+.v-theme--light .welcome-sub { color: #64748b; }
+.v-theme--light .w-step { background: #ffffff; border-color: #e2e8f0; color: #64748b; }
+.v-theme--light .w-step.done { border-color: rgba(15,118,110,0.3); color: #475569; }
+.v-theme--light .step-num { background: #e2e8f0; color: #94a3b8; }
+.v-theme--light .w-step.done .step-num { background: rgba(15,118,110,0.12); color: #0f766e; }
+.v-theme--light .run-status-badge { background: #ffffff; border-color: #e2e8f0; }
+.v-theme--light .run-status-badge.status-idle { border-color: #e2e8f0; }
+.v-theme--light .run-status-badge.status-running { border-color: rgba(15,118,110,0.4); background: rgba(15,118,110,0.05); }
+.v-theme--light .run-status-badge.status-done { border-color: rgba(5,150,105,0.4); background: rgba(5,150,105,0.05); }
+.v-theme--light .run-status-dot { background: #cbd5e1; }
+.v-theme--light .run-status-label { color: #475569; }
+.v-theme--light .run-status-badge.status-running .run-status-label { color: #0f766e; }
+.v-theme--light .run-status-badge.status-done .run-status-label { color: #059669; }
+.v-theme--light .run-status-phase { color: #64748b; }
+.v-theme--light .run-status-calls { color: #94a3b8; }
+.v-theme--light .run-status-cost { color: #0f766e; background: rgba(15,118,110,0.1); }
+.v-theme--light .generate-title { color: #0f172a; }
+.v-theme--light .generate-sub { color: #64748b; }
+.v-theme--light .gen-col-title { color: #64748b; border-bottom-color: #e2e8f0; }
+</style>
